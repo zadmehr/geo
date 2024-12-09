@@ -12,13 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-
-import java.util.List;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(initializers = TestContainersMongoConfig.Initializer.class)
@@ -45,6 +41,24 @@ class StoreControllerITest {
                 "/api/v1/nearest-stores?latitude=52.37867&longitude=4.883832", StoresResult.class);
 
         Assertions.assertThat(response.getStatusCode().value()).isEqualTo(200);
+    }
+
+    // result is Latitude must be between -90 and 90 degrees.
+    @Test
+    void getNearestStores_withInvalidLatitude() {
+        // Invalid latitude
+        ResponseEntity<String> response = testRestTemplate.getForEntity(
+                "/api/v1/nearest-stores?latitude=95.0&longitude=4.883832", String.class);
+                Assertions.assertThat(response.getBody()).contains("Latitude must be between -90 and 90 degrees.");
+    }
+
+    //Longitude must be between -180 and 180 degrees
+    @Test
+    void getNearestStores_withInvalidLongitude() {
+        // Invalid longitude
+        ResponseEntity<String> response = testRestTemplate.getForEntity(
+                "/api/v1/nearest-stores?latitude=52.37867&longitude=185.0", String.class);
+                Assertions.assertThat(response.getBody()).contains("Longitude must be between -180 and 180 degrees.");
     }
 
     private void initialization() {
