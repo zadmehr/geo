@@ -61,6 +61,7 @@ class StoreControllerITest {
                 Assertions.assertThat(response.getBody()).contains("Longitude must be between -180 and 180 degrees.");
     }
 
+
     private void initialization() {
         Store store1 = Store.builder()
                 .city("Amsterdam")
