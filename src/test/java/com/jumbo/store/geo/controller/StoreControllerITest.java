@@ -61,6 +61,22 @@ class StoreControllerITest {
                 Assertions.assertThat(response.getBody()).contains("Longitude must be between -180 and 180 degrees.");
     }
 
+        //Latitude is required
+        @Test
+        void getNearestStores_withMissingLatitude() {
+            // Missing latitude
+            ResponseEntity<String> response = testRestTemplate.getForEntity(
+                    "/api/v1/nearest-stores?longitude=4.883832", String.class);
+                    Assertions.assertThat(response.getBody()).contains("Latitude is required");
+        }
+        // Longitude is required
+        @Test
+        void getNearestStores_withMissingLongitude() {
+            // Missing longitude
+            ResponseEntity<String> response = testRestTemplate.getForEntity(
+                    "/api/v1/nearest-stores?latitude=52.37867", String.class);
+                    Assertions.assertThat(response.getBody()).contains("Longitude is required");
+        }
 
     private void initialization() {
         Store store1 = Store.builder()
