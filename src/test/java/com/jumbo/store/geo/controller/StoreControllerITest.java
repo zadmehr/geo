@@ -6,12 +6,15 @@ import com.jumbo.store.geo.controller.dto.StoresResult;
 import com.jumbo.store.geo.model.Store;
 import com.jumbo.store.geo.repository.StoreRepository;
 
+import java.util.Objects;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -36,11 +39,18 @@ class StoreControllerITest {
     }
 
     @Test
-    void getNearestStores() {
+    void getNearestStoresStatus() {
         ResponseEntity<StoresResult> response = testRestTemplate.getForEntity(
                 "/api/v1/nearest-stores?latitude=52.37867&longitude=4.883832", StoresResult.class);
 
         Assertions.assertThat(response.getStatusCode().value()).isEqualTo(200);
+    }
+
+    @Test
+    void getNearestStores() {
+        ResponseEntity<StoresResult> response = testRestTemplate.getForEntity(
+                "/api/v1/nearest-stores?latitude=52.37867&longitude=4.883832", StoresResult.class);
+                Assertions.assertThat(Objects.requireNonNull(response.getBody()).stores().size()).isEqualTo(2);
     }
 
     // result is Latitude must be between -90 and 90 degrees.
@@ -85,6 +95,9 @@ class StoreControllerITest {
                 .street("Damstraat")
                 .longitude(4.895168)
                 .latitude(52.370216)
+                .location(
+                    new GeoJsonPoint(4.883832, 52.37867)
+                )
                 .build();
 
         Store store2 = Store.builder()
@@ -93,6 +106,9 @@ class StoreControllerITest {
                 .street("Coolsingel")
                 .longitude(4.47917)
                 .latitude(51.9225)
+                .location(
+                    new GeoJsonPoint(4.883831, 52.37866)
+                )
                 .build();
 
         storeRepository.save(store1);
